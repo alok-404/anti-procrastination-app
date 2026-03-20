@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Do It Now</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <h2>Do It Now</h2>
+
+      <!-- Emotional Message -->
+      <div class="message" id="message">Kitne din maze karega bhai</div>
+
+      <!-- Input -->
+      <div class="task-input">
+        <input type="text" placeholder="Add a task (max 5)" />
+        <button class="add-btn">Add</button>
+      </div>
+
+      <!-- Task List -->
+      <div class="task-list" id="taskList">
+        <!-- Dummy Task 1 -->
+        <!-- <div class="task-card" data-id="1">
+        <span class="task-text">Drink water</span>
+         <div class="timer">05:00</div>
+        <div class="task-buttons">
+          <button class="start-btn">Start</button>
+          <button class="done-btn">Done</button>
+          <button class="skip-btn">Skip</button>
+        </div>
+      </div> -->
+
+        <!-- Dummy Task 2 -->
+        <!-- <div class="task-card" data-id="2">
+        <span class="task-text">Write 100 words</span>
+        <div class="task-buttons">
+          <button class="start-btn">Start</button>
+          <button class="done-btn">Done</button>
+          <button class="skip-btn">Skip</button>
+        </div>
+      </div> -->
+      </div>
+
+      <!-- Score Section -->
+      <div class="scoreboard">
+        <div>Total Score: <span id="score">20</span></div>
+        <div>Missed Count: <span id="missed">1</span></div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state">No tasks — add one</div>
+
+
+      <!-- for reason -->
+      <div class="popup-overlay" id="popup">
+        <div class="popup-box">
+          <p>Why did you skip?</p>
+          <input type="text" id="ReasonPopupInput" placeholder="1 line reason..." />
+          <div class="popup-actions">
+            <button id="saveReason">Save</button>
+            <button id="cancelPopup">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

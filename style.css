@@ -1,0 +1,183 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.app-container {
+  width: 400px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.message {
+  background-color: #fffae6;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.task-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.task-input input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.task-input .add-btn {
+  padding: 10px 15px;
+  border: none;
+  background-color: #4caf50;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.task-card {
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.task-card:hover {
+  background-color: #e3f2fd;
+}
+
+ .in-progress {
+  border: 2px solid #2196f3;
+  background-color: #d9e3dd;
+}
+
+.task-text {
+  font-weight: bold;
+}
+
+.task-buttons button {
+  margin-left: 5px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.start-btn { background-color: #2196f3; color: white; }
+.done-btn { background-color: #4caf50; color: white; }
+.skip-btn { background-color: #f44336; color: white; }
+
+.timer {
+  font-weight: bold;
+  color: #2196f3;
+  margin-right: 10px;
+}
+
+.scoreboard {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.empty-state {
+  text-align: center;
+  color: #777;
+  font-style: italic;
+}
+
+/* Popup */
+.task-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.5);
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.popup-buttons button {
+  margin-right: 5px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#editBtn { background-color: #ff9800; color: white; }
+#saveBtn { background-color: #4caf50; color: white; }
+#deleteBtn { background-color: #f44336; color: white; }
+#closeBtn { background-color: #9e9e9e; color: white; }
+
+
+.completed {
+  text-decoration: line-through;
+  opacity: 0.6;
+  transition: 0.3s;
+}
+
+
+
+
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+}
+
+.popup-box input {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: space-between;
+}
