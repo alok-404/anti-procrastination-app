@@ -60,6 +60,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
+
 }
 .task-card:hover {
   background-color: #e3f2fd;
@@ -180,4 +182,73 @@ body {
 .popup-actions {
   display: flex;
   justify-content: space-between;
+}
+
+
+/* card layout */
+/* .task-card {
+  background: #1e1e1e;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+} */
+
+/* buttons */
+.task-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+button {
+  cursor: pointer;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+}
+
+/* menu button */
+.menu-btn {
+  background: #333;
+  color: white;
+  font-size: 18px;
+}
+
+/* dropdown menu */
+.dropdown-menu {
+  position: absolute;
+  top: 40px;
+  right: 10px;
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 5px;
+  display: none;
+  flex-direction: column;
+  min-width: 100px;
+  z-index: 10;
+}
+
+/* show menu */
+.dropdown-menu.show {
+  display: flex;
+}
+
+/* menu buttons */
+.dropdown-menu button {
+  background: transparent;
+  color: white;
+  text-align: left;
+  padding: 8px;
+  width: 100%;
+}
+
+.dropdown-menu button:hover {
+  background: #444;
+}
+
+/* completed task */
+.completed {
+  text-decoration: line-through;
+  opacity: 0.6;
 }

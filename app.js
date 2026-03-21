@@ -1,208 +1,398 @@
-class DoItNow {
+class AntiProcastinationApp {
   constructor() {
     this.container = document.querySelector(".task-list");
-    this.inputTask();
-    this.tasks = [];
-
     this.popup = document.querySelector(".popup-overlay");
     this.reasonInput = document.querySelector("#ReasonPopupInput");
     this.saveReasonBtn = document.querySelector("#saveReason");
     this.cancelBtn = document.querySelector("#cancelPopup");
-
-    // this.originalTasks = [];
-    this.currentTask = null;
 
     this.saveReasonBtn.addEventListener("click", () => {
       if (!this.currentTask) return;
 
       const reason = this.reasonInput.value.trim();
 
-      this.currentTask.reason = reason || "NO reason";
+      this.currentTask.reason = reason || "no reason";
       this.currentTask.status = "skipped";
+      this.saveToLocalStorage();
 
-      clearInterval(this.currentTask.intervalId);
-      this.currentTask.intervalId = null;
+      clearInterval(this.currentTask.intervalID);
+      this.currentTask.intervalID = null;
 
       this.closePopup();
-      this.renderTask();
+      this.renderTasks();
     });
     this.cancelBtn.addEventListener("click", () => {
       this.closePopup();
     });
+
+    this.tasks = [];
+    this.currentTask = null;
+  }
+  init() {
+    const data = localStorage.getItem("tasks");
+    this.tasks = data ? JSON.parse(data) : [];
+
+    this.tasks.forEach((task) => {
+      if (task.status === "in-progress") {
+        task.status = "paused";
+        task.intervalID = null;
+      }
+    });
+
+    console.log("app started");
+    this.renderTasks();
+    this.inputTask();
   }
   inputTask() {
-    // console.log("dom");
     const taskInput = document.querySelector(".task-input input");
     const taskAddBtn = document.querySelector(".task-input .add-btn");
+
     taskAddBtn.addEventListener("click", () => {
       const task = taskInput.value.trim();
-      if (task.length === 0 || task.length < 3) {
+
+      if (task.length < 3 || task.length === 0) {
         alert("Invalid Input");
         return;
       }
-
+      // console.log(task);
       this.addTask(task);
     });
   }
-  init() {
-    console.log("start");
-  }
   addTask(task) {
-    console.log(task);
+    // console.log("add task = " + task );
+
     const newTask = {
       id: Date.now(),
       task,
       status: "pending",
-      timeLeft: 300,
-      intervalId: null,
       reason: null,
+      timeLeft: 300,
+      intervalID: null,
     };
-    // console.log(this.tasks.length);
 
-    if (this.tasks.length > 5) {
-      alert("You can add 5 Task only wrna tu procastinating krega");
+    if (this.tasks.length >= 5) {
+      alert("You can add only 5 tasks wrna tu procastinate krega");
       return;
     }
+
     this.tasks.push(newTask);
+    // console.log(newTask);
 
-    // this.originalTasks = [...this.tasks];
-
-    console.log(this.tasks);
-    // console.log(this.originalTasks);
-    this.renderTask();
+    this.saveToLocalStorage();
+    this.renderTasks();
   }
-  renderTask(tasks = this.tasks) {
-    this.container.innerHTML = "";
 
-    if (tasks.length === 0) {
-      this.container.innerHTML = "No Task found";
-      return;
-    }
+  //   renderTasks(tasks = this.tasks) {
+  //     this.container.innerHTML = "";
+  //     // console.log(tasks);
+  //     tasks.forEach((task) => {
+  //       const card = document.createElement("div");
+  //       card.classList.add("task-card");
+  //       card.dataset.id = task.id;
+
+  //       // Text
+  //       const text = document.createElement("span");
+  //       text.classList.add("task-text");
+  //       text.textContent = task.task;
+
+  //       if (task.status === "done") {
+  //         text.classList.add("completed");
+  //       }
+
+  //       // ✅ Timer
+  //       const timer = document.createElement("div");
+  //       timer.classList.add("timer");
+
+  //       if (task.status === "in-progress") {
+  //         timer.textContent = this.formatTime(task.timeLeft);
+  //         card.classList.add("in-progress");
+  //       } else {
+  //         timer.style.display = "none";
+  //       }
+
+  //       // Button container
+  //       const btnContainer = document.createElement("div");
+  //       btnContainer.classList.add("task-buttons");
+
+  //       const startBtn = document.createElement("button");
+  //       startBtn.classList.add("start-btn");
+  //       startBtn.textContent = "Start";
+
+  //       startBtn.addEventListener("click", (e) => {
+  //         e.stopPropagation();
+  //         this.timerLogic(task);
+  //       });
+  //       if (task.status === "in-progress") {
+  //         startBtn.textContent = "Pause";
+  //       } else if (task.status === "paused") {
+  //         startBtn.textContent = "Resume";
+  //       } else {
+  //         startBtn.textContent = "Start";
+  //       }
+
+  //       const doneBtn = document.createElement("button");
+  //       doneBtn.classList.add("done-btn");
+  //       doneBtn.textContent = "Done";
+
+  //       doneBtn.addEventListener("click", (e) => {
+  //         e.stopPropagation();
+  //         this.doneBtnLogic(task);
+  //       });
+
+  //       const menuBtn = document.createElement("button");
+  //       menuBtn.textContent = "⋮";
+  //       menuBtn.classList.add("menu-btn");
+
+  //       const menu = document.createElement("div");
+  //       menu.classList.add("dropdown-menu");
+
+  //       menu.innerHTML = `
+  //   <button class="skip-option">Skip</button>
+  //   <button class="edit-option">Edit</button>
+  //   <button class="delete-option">Delete</button>
+  // `;
+
+  //       menuBtn.addEventListener("click", (e) => {
+  //         e.stopPropagation();
+  //         menu.classList.toggle("show");
+  //       });
+
+  //       menu.querySelector(".skip-option").onclick = () => {
+  //         this.openPopUp(task);
+  //       };
+
+  //       menu.querySelector(".edit-option").onclick = () => {
+  //         console.log("edit clicked"); // abhi placeholder
+  //       };
+
+  //       menu.querySelector(".delete-option").onclick = () => {
+  //         this.tasks = this.tasks.filter((t) => t.id !== task.id);
+  //         this.renderTasks();
+  //       };
+
+  //       const skipBtn = document.createElement("button");
+  //       skipBtn.classList.add("skip-btn");
+  //       skipBtn.textContent = "Skip";
+
+  //       skipBtn.addEventListener("click", (e) => {
+  //         e.stopPropagation();
+
+  //         this.openPopUp(task);
+  //       });
+
+  //       if (task.status === "done") {
+  //         doneBtn.textContent = "You did it";
+  //         doneBtn.style.backgroundColor = "grey";
+  //         startBtn.style.display = "none";
+  //         skipBtn.style.display = "none";
+  //       }
+  //       btnContainer.append(startBtn, doneBtn, menuBtn);
+
+  //       // Append
+  //       card.append(text, timer, btnContainer, menu);
+  //       this.container.appendChild(card);
+
+  //       // 👉 Popup
+  //       // card.addEventListener("click", (e) => {
+  //       //   if (e.target.tagName === "BUTTON") return;
+  //       //   this.openPopup(task);
+  //       // });
+  //     });
+  //   }
+
+  renderTasks(tasks = this.tasks) {
+    this.container.innerHTML = "";
 
     tasks.forEach((task) => {
       const card = document.createElement("div");
       card.classList.add("task-card");
       card.dataset.id = task.id;
 
-      // Text
+      // TEXT
       const text = document.createElement("span");
       text.classList.add("task-text");
       text.textContent = task.task;
 
-       if (task.status === "done"){
-        text.classList.add("completed")
-       }
+      if (task.status === "done" || task.status === "skip") {
+        text.classList.add("completed");
+      }
 
-      
-
-      // ✅ Timer
+      // TIMER
       const timer = document.createElement("div");
       timer.classList.add("timer");
 
-      // Default 5 min
       if (task.status === "in-progress") {
         timer.textContent = this.formatTime(task.timeLeft);
-          card.classList.add("in-progress");
+        card.classList.add("in-progress");
       } else {
         timer.style.display = "none";
       }
 
-      // Button container
+      // BUTTON CONTAINER
       const btnContainer = document.createElement("div");
       btnContainer.classList.add("task-buttons");
 
+      // START BUTTON
       const startBtn = document.createElement("button");
       startBtn.classList.add("start-btn");
-      startBtn.textContent = "Start";
+
+      if (task.status === "in-progress") {
+        startBtn.textContent = "Pause";
+      } else if (task.status === "paused") {
+        startBtn.textContent = "Resume";
+      } else {
+        startBtn.textContent = "Start";
+      }
 
       startBtn.addEventListener("click", (e) => {
-        // console.log("hello");
         e.stopPropagation();
         this.timerLogic(task);
       });
 
+      // DONE BUTTON
       const doneBtn = document.createElement("button");
       doneBtn.classList.add("done-btn");
       doneBtn.textContent = "Done";
 
       doneBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-
-        task.status = "done";
-
-        clearInterval(task.intervalId);
-        task.intervalId = null;
-
-        this.renderTask();
+        this.doneBtnLogic(task);
       });
 
-     
+      // THREE DOT BUTTON
+      const menuBtn = document.createElement("button");
+      menuBtn.textContent = "⋮";
+      menuBtn.classList.add("menu-btn");
 
-      const skipBtn = document.createElement("button");
-      skipBtn.classList.add("skip-btn");
-      skipBtn.textContent = "Skip";
+      // DROPDOWN MENU
+      const menu = document.createElement("div");
+      menu.classList.add("dropdown-menu");
 
-      skipBtn.addEventListener("click", (e) => {
+      menu.innerHTML = `
+      <button class="skip-option">Skip</button>
+      <button class="edit-option">Edit</button>
+      <button class="delete-option">Delete</button>
+    `;
+
+      // TOGGLE MENU
+      menuBtn.addEventListener("click", (e) => {
         e.stopPropagation();
+
+        // close other menus
+        document.querySelectorAll(".dropdown-menu").forEach((m) => {
+          if (m !== menu) m.classList.remove("show");
+        });
+
+        menu.classList.toggle("show");
+      });
+
+      // MENU ACTIONS
+      menu.querySelector(".skip-option").addEventListener("click", () => {
         this.openPopUp(task);
       });
 
-   
- if (task.status === "done") {
+      menu.querySelector(".edit-option").addEventListener("click", () => {
+        console.log("edit clicked"); // next step me implement karenge
+      });
+
+      menu.querySelector(".delete-option").addEventListener("click", () => {
+        this.tasks = this.tasks.filter((t) => t.id !== task.id);
+        this.saveToLocalStorage();
+
+        this.renderTasks();
+      });
+
+      // DONE STATE UI
+      if (task.status === "done") {
         doneBtn.textContent = "You did it";
         doneBtn.style.backgroundColor = "grey";
-
         startBtn.style.display = "none";
-        skipBtn.style.display = "none";
+        menuBtn.style.display = "none";
+      } else if (task.status === "skipped") {
+        startBtn.style.display = "none";
+        menuBtn.style.display = "none";
+        btnContainer.innerHTML = "Skipped";
+        doneBtn.style.display = "none";
+        text.classList.add("completed");
       }
-      btnContainer.append(startBtn, doneBtn, skipBtn);
 
-      // Append
-      card.append(text, timer, btnContainer);
+      // APPEND BUTTONS
+      btnContainer.append(startBtn, doneBtn, menuBtn);
+
+      // APPEND ALL
+      card.append(text, timer, btnContainer, menu);
       this.container.appendChild(card);
+    });
 
-      // // 👉 Popup
-      // card.addEventListener("click", (e) => {
-      //   if (e.target.tagName === "BUTTON") return;
-      //   this.openPopup(task);
-      // });
+    // CLICK OUTSIDE → CLOSE ALL MENUS
+    document.addEventListener("click", () => {
+      document.querySelectorAll(".dropdown-menu").forEach((m) => {
+        m.classList.remove("show");
+      });
     });
   }
   timerLogic(task) {
-    // console.log(task);
+    //pause krega timer ko
+    if (task.intervalID) {
+      clearInterval(task.intervalID);
+      task.intervalID = null;
+      task.status = "paused";
+      this.renderTasks();
+      return;
+    }
 
+    //stop other timers
     this.tasks.forEach((t) => {
-      if (t.intervalId) {
-        clearInterval(t.intervalId);
-        t.intervalId = null;
-        t.status = "pending";
+      if (t.intervalID) {
+        //because setInterval always gives u id
+        clearInterval(t.intervalID);
+        t.status = "paused";
+        t.intervalID = null;
       }
     });
 
+    //start/resume
     task.status = "in-progress";
-    document.querySelector(".task-card").classList.add("in-progress");
-    task.intervalId = setInterval(() => {
+    this.saveToLocalStorage();
+
+    task.intervalID = setInterval(() => {
       task.timeLeft--;
 
       if (task.timeLeft <= 0) {
-        clearInterval(task.intervalId);
-        task.intervalId = null;
+        clearInterval(task.intervalID);
         task.status = "done";
+        this.saveToLocalStorage();
+
+        task.intervalID = null;
       }
 
-      this.renderTask(); // update UI every second
+      this.renderTasks();
     }, 1000);
 
-    this.renderTask();
+    this.saveToLocalStorage();
+
+    this.renderTasks();
   }
 
   formatTime(seconds) {
     const min = Math.floor(seconds / 60);
-    const sec = seconds % 60;
+    const sec = Math.floor(seconds % 60);
     return `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
   }
 
+  doneBtnLogic(task) {
+    task.status = "done";
+
+    clearInterval(task.intervalID);
+    task.intervalID = null;
+    this.saveToLocalStorage();
+
+    this.renderTasks();
+  }
+
   openPopUp(task) {
+    console.log(task);
+
     this.popup.style.display = "flex";
     this.reasonInput.value = "";
     this.currentTask = task;
@@ -212,29 +402,11 @@ class DoItNow {
     this.popup.style.display = "none";
     this.currentTask = null;
   }
+
+  saveToLocalStorage() {
+    localStorage.setItem("tasks", JSON.stringify(this.tasks));
+  }
 }
 
-let app = new DoItNow();
+const app = new AntiProcastinationApp();
 app.init();
-
-// function buttonWork() {
-//   const taskCards = document.querySelectorAll(".task-card");
-//   const popup = document.getElementById("taskPopup");
-//   const popupInput = document.getElementById("popupTaskInput");
-//   const closeBtn = document.getElementById("closeBtn");
-
-//   taskCards.forEach((card) => {
-//     card.addEventListener("click", () => {
-//       popup.style.display = "flex";
-//       popupInput.value = card.querySelector(".task-text").textContent;
-//       // You can store the task id if needed
-//       popup.dataset.currentTaskId = card.dataset.id;
-//     });
-//   });
-
-//   closeBtn.addEventListener("click", () => {
-//     popup.style.display = "none";
-//   });
-// }
-
-// buttonWork();
