@@ -1,320 +1,283 @@
-// // class DoItNowApp {
-// //   constructor() {
-// //     this.tasks = [];
-// //     this.score = 0;
-
-// //     this.loadFromLocalStorage();
-// //     this.init();
-// //   }
-
-// //   init() {
-// //     this.handleAddTask();
-// //     this.renderTasks();
-// //   }
-
-// //   addTask(text) {
-// //     if (this.tasks.length >= 5) return alert("Max 5 tasks only");
-
-// //     const task = {
-// //       id: Date.now(),
-// //       text,
-// //       status: "pending"
-// //     };
-
-// //     this.tasks.push(task);
-// //     this.saveToLocalStorage();
-// //     this.renderTasks();
-// //   }
-
-// //   renderTasks() {
-// //     // DOM logic
-// //   }
-
-// //   startTask(id) {
-// //     // timer logic
-// //   }
-
-// //   markDone(id) {
-// //     this.score += 10;
-// //   }
-
-// //   skipTask(id) {
-// //     this.score -= 5;
-// //   }
-
-// //   saveToLocalStorage() {
-// //     localStorage.setItem("tasks", JSON.stringify(this.tasks));
-// //   }
-
-// //   loadFromLocalStorage() {
-// //     const data = JSON.parse(localStorage.getItem("tasks"));
-// //     if (data) this.tasks = data;
-// //   }
-// // }
-
-// Perfect — ab overthinking band, execution start.
-// Main tujhe clear, no-BS 3-day plan deta hoon.
-
-// 🧠 App naam (rakh le)
-
-// 👉 Do It Now
-
-// 🎯 Core rule (yaad rakh)
-// open → tap task → timer start → done
-
-// 👉 agar isme friction aaya → app fail
-
-// 🏗️ Features (LOCK THESE — aur kuch add nahi)
-// ✔ max 5 tasks
-// ✔ start button (timer)
-// ✔ done / skip
-// ✔ emotional message
-// ✔ score system
-// 📁 Folder Structure
-// /do-it-now
-//  ├── index.html
-//  ├── style.css
-//  ├── app.js
-//  ├── data.js (optional)
-// 📅 DAY 1 → Core Functionality (MOST IMPORTANT)
-// 🎯 Goal:
-
-// App chalna chahiye (ugly chalega, no problem)
-
-// ✅ Step 1: Basic UI
-// ✔ input box (add task)
-// ✔ task list (max 5)
-// ✔ start button
-// ✔ done & skip buttons
-// ✔ score display
-// ✅ Step 2: Data Structure
-// let tasks = [
-//   {
-//     id: Date.now(),
-//     text: "Drink water",
-//     status: "pending"
-//   }
-// ];
-// ✅ Step 3: Core functions
-// ✔ addTask()
-// ✔ renderTasks()
-// ✔ deleteTask()
-// ✔ limit tasks to 5
-// ✅ Step 4: Start Task (🔥 important)
-// ✔ click → timer start (5 min)
-// ✔ UI change: “In Progress”
-// ✅ Step 5: Done / Skip
-// ✔ done → +10 points
-// ✔ skip → -5 points
-// ✔ update UI
-
-// 👉 End of Day 1:
-
-// app working ✔
-// logic clear ✔
-// 📅 DAY 2 → Product Feel
-// 🎯 Goal:
-
-// “ye app lagna chahiye”
-
-// ✅ Step 6: Emotional Messages (🔥 USP)
-
-// Create array:
-
-// const messages = [
-//   "Bhai bas 2 min ka kaam hai",
-//   "Kal bhi skip kiya tha",
-//   "Stop delaying. Start now.",
-//   "Excuses band kar"
-// ];
-
-// 👉 show randomly:
-
-// ✔ on app load
-// ✔ on skip
-// ✔ on idle
-// ✅ Step 7: Timer UI
-// ✔ 5 min countdown
-// ✔ show remaining time
-// ✅ Step 8: Score System
-// ✔ show total score
-// ✔ show “missed count”
-// ✅ Step 9: LocalStorage
-// ✔ save tasks
-// ✔ save score
-
-// 👉 End of Day 2:
-
-// real product feel ✔
-// data persistent ✔
-// 📅 DAY 3 → Polish + Differentiation
-// 🎯 Goal:
-
-// “resume-worthy banana”
-
-// ✅ Step 10: Clean UI
-// ✔ centered layout
-// ✔ big buttons
-// ✔ minimal design
-// ✅ Step 11: Music (simple version)
-// ✔ add 1 YouTube/Audio link
-// ✔ task start → play audio
-
-// 👉 bas — over mat karna
-
-// ✅ Step 12: Reflection (mini)
-// ✔ skip → prompt:
-// “Why didn’t you do it?”
-// ✔ save 1 line
-// ✅ Step 13: Empty State
-// ✔ “No tasks — add one”
-// ✔ “Good job today”
-
-// 👉 End of Day 3:
-
-// clean ✔
-// unique ✔
-// complete ✔
-// 🧠 Important Rules
-// ❌ Mat karna:
-// ❌ 10+ features
-// ❌ complex UI
-// ❌ animations pe time waste
-// ❌ login system
-// ✅ Focus:
-// ✔ speed
-// ✔ simplicity
-// ✔ behavior push
-// 🚀 Final Output (resume level)
-
-// 👉 tu confidently bolega:
-
-// Built a micro-task based anti-procrastination app with emotional triggers, timer-based execution, and scoring system to encourage action over planning.
-// 🔥 Final push
-
-// 👉 ab:
-
-// plan ho gaya ✔
-// confusion khatam ✔
-
-// 👉 next:
-
-// START DAY 1 NOW
-
-// Agar atka kahin bhi
-// 👉 code ya logic — seedha bhej dena, main fix karwa dunga 🚀
-
-// Opps use kruu 
-// Firstly todo ke liye like class todo{
-// Constuctor(){}
-// This.todo = []
-// }
-// Add toto ese methods krke kux
-
-// Haan — use kar sakta hai OOP, but ek cheez clear samajh:
-
-// 👉 OOP use karna ≠ better project automatically
-
-// 🧠 Brutal truth
-// simple clean code ✔ > unnecessary OOP ❌
-
-// 👉 agar tu forcefully class ghusaega:
-
-// overengineering ho jayega ❌
-// ✅ Tere case me kya sahi hai?
-
-// 👉 is project ke liye:
-
-// OOP = optional ✔
-// but useful for structure ✔
-
-// 👉 especially kyunki tu already OOP padh chuka hai
-
-// 🔥 Best approach (balanced)
-
-// 👉 pura app ek class me wrap kar:
-
-// class DoItNowApp {
-//   constructor() {
-//     this.tasks = [];
-//     this.score = 0;
-
-//     this.loadFromLocalStorage();
-//     this.init();
-//   }
-
-//   init() {
-//     this.handleAddTask();
-//     this.renderTasks();
-//   }
-
-//   addTask(text) {
-//     if (this.tasks.length >= 5) return alert("Max 5 tasks only");
-
-//     const task = {
-//       id: Date.now(),
-//       text,
-//       status: "pending"
-//     };
-
-//     this.tasks.push(task);
-//     this.saveToLocalStorage();
-//     this.renderTasks();
-//   }
-
-//   renderTasks() {
-//     // DOM logic
-//   }
-
-//   startTask(id) {
-//     // timer logic
-//   }
-
-//   markDone(id) {
-//     this.score += 10;
-//   }
-
-//   skipTask(id) {
-//     this.score -= 5;
-//   }
-
-//   saveToLocalStorage() {
-//     localStorage.setItem("tasks", JSON.stringify(this.tasks));
-//   }
-
-//   loadFromLocalStorage() {
-//     const data = JSON.parse(localStorage.getItem("tasks"));
-//     if (data) this.tasks = data;
-//   }
-// }
-// 🧠 Why this works
-// ✔ clean structure
-// ✔ easy to manage
-// ✔ interview me explain easy
-// ⚠️ Common mistakes (mat karna)
-// ❌ 1. 10 classes banana
-// TaskManager, UIManager, TimerManager ❌
-
-// 👉 overkill
-
-// ❌ 2. sirf OOP dikhane ke liye use karna
-// logic kharab + code complex ❌
-// 🎯 Best practice
-
-// 👉 simple rule:
-
-// 1 main class ✔
-// few methods ✔
-// clear logic ✔
-// 🔥 Final verdict
-// YES → OOP use kar ✔
-// BUT → simple rakho, over mat kar ❌
-
-// 👉 tu agar ye class-based clean app bana deta hai
-
-// interviewer bolega:
-// “acha structure hai bande ka”
-
-// Agar chahe toh
-// main tujhe full starter boilerplate (HTML + JS class setup) de deta hoon
-// taaki tu seedha start kare without thinking 🚀
+class AntiProcastinationApp {
+  constructor() {
+    this.tasks = [];
+    this.currentTask = null;
+    this.mode = null;
+
+    this.container = document.querySelector(".task-list");
+    this.popup = document.querySelector(".popup-overlay");
+    this.reasonInput = document.querySelector("#ReasonPopupInput");
+    this.saveReasonBtn = document.querySelector("#saveReason");
+    this.cancelBtn = document.querySelector("#cancelPopup");
+
+    this.saveReasonBtn.addEventListener("click", () => this.handlePopupSave());
+    this.cancelBtn.addEventListener("click", () => this.closePopup());
+
+    document.addEventListener("click", () => {
+      document.querySelectorAll(".dropdown-menu").forEach((m) => {
+        m.classList.remove("show");
+      });
+    });
+  }
+
+  init() {
+    const data = localStorage.getItem("tasks");
+    this.tasks = data ? JSON.parse(data) : [];
+
+    // reset running timers
+    this.tasks.forEach((task) => {
+      if (task.status === "in-progress") {
+        task.status = "paused";
+        task.intervalID = null;
+      }
+    });
+
+    this.renderTasks();
+    this.inputTask();
+  }
+
+  inputTask() {
+    const input = document.querySelector(".task-input input");
+    const btn = document.querySelector(".add-btn");
+
+    btn.addEventListener("click", () => {
+      const value = input.value.trim();
+      if (value.length < 3) return alert("Invalid Input");
+
+      this.addTask(value);
+      input.value = "";
+    });
+  }
+
+  addTask(task) {
+    if (this.tasks.length >= 5) {
+      return alert("Max 5 tasks allowed");
+    }
+
+    this.tasks.push({
+      id: Date.now(),
+      task,
+      status: "pending",
+      timeLeft: 300,
+      intervalID: null,
+      reason: null,
+    });
+
+    this.save();
+    this.renderTasks();
+  }
+
+  renderTasks() {
+    this.container.innerHTML = "";
+
+    this.tasks.forEach((task) => {
+      const card = document.createElement("div");
+      card.className = "task-card";
+
+      // TEXT
+      const text = document.createElement("span");
+      text.textContent = task.task;
+
+      if (task.status === "done" || task.status === "skipped") {
+        text.classList.add("completed");
+      }
+
+      // TIMER
+      const timer = document.createElement("div");
+      timer.className = "timer";
+      timer.dataset.id = task.id;
+
+      if (task.status === "in-progress") {
+        timer.textContent = this.formatTime(task.timeLeft);
+      } else {
+        timer.style.display = "none";
+      }
+
+      // BUTTONS
+      const btns = document.createElement("div");
+
+      if (task.status === "skipped") {
+        btns.textContent = "Skipped";
+      } else if (task.status === "done") {
+        btns.textContent = "Completed";
+      } else {
+        btns.append(
+          this.createStartBtn(task),
+          this.createDoneBtn(task),
+          this.createMenu(task)
+        );
+      }
+
+      card.append(text, timer, btns);
+      this.container.appendChild(card);
+    });
+  }
+
+  createStartBtn(task) {
+    const btn = document.createElement("button");
+
+    btn.textContent =
+      task.status === "in-progress"
+        ? "Pause"
+        : task.status === "paused"
+        ? "Resume"
+        : "Start";
+
+    btn.onclick = () => this.handleTimer(task);
+
+    return btn;
+  }
+
+  createDoneBtn(task) {
+    const btn = document.createElement("button");
+    btn.textContent = "Done";
+
+    btn.onclick = () => {
+      clearInterval(task.intervalID);
+      task.status = "done";
+      task.intervalID = null;
+
+      this.save();
+      this.renderTasks();
+    };
+
+    return btn;
+  }
+
+  createMenu(task) {
+    const wrapper = document.createElement("div");
+
+    const btn = document.createElement("button");
+    btn.textContent = "⋮";
+
+    const menu = document.createElement("div");
+    menu.className = "dropdown-menu";
+
+    menu.innerHTML = `
+      <button class="skip">Skip</button>
+      <button class="edit">Edit</button>
+      <button class="delete">Delete</button>
+    `;
+
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      menu.classList.toggle("show");
+    };
+
+    menu.querySelector(".skip").onclick = () =>
+      this.openPopup(task, "skip");
+
+    menu.querySelector(".edit").onclick = () =>
+      this.openPopup(task, "edit");
+
+    menu.querySelector(".delete").onclick = () => {
+      this.tasks = this.tasks.filter((t) => t.id !== task.id);
+      this.save();
+      this.renderTasks();
+    };
+
+    wrapper.append(btn, menu);
+    return wrapper;
+  }
+
+  handleTimer(task) {
+    // pause
+    if (task.intervalID) {
+      clearInterval(task.intervalID);
+      task.intervalID = null;
+      task.status = "paused";
+      this.save();
+      this.renderTasks();
+      return;
+    }
+
+    // stop others
+    this.tasks.forEach((t) => {
+      if (t.intervalID) {
+        clearInterval(t.intervalID);
+        t.intervalID = null;
+        t.status = "paused";
+      }
+    });
+
+    task.status = "in-progress";
+
+    task.intervalID = setInterval(() => {
+      task.timeLeft--;
+
+      if (task.timeLeft <= 0) {
+        clearInterval(task.intervalID);
+        task.intervalID = null;
+        task.status = "done";
+
+        this.save();
+        this.renderTasks();
+        return;
+      }
+
+      this.updateTimer(task);
+    }, 1000);
+
+    this.save();
+    this.renderTasks();
+  }
+
+  updateTimer(task) {
+    const el = document.querySelector(
+      `.timer[data-id="${task.id}"]`
+    );
+    if (el) el.textContent = this.formatTime(task.timeLeft);
+  }
+
+  openPopup(task, mode) {
+    this.popup.style.display = "flex";
+    this.currentTask = task;
+    this.mode = mode;
+
+    if (mode === "skip") {
+      this.reasonInput.value = "";
+      this.reasonInput.placeholder = "Why skip?";
+    } else {
+      this.reasonInput.value = task.task;
+      this.reasonInput.placeholder = "Edit task";
+    }
+  }
+
+  handlePopupSave() {
+    const value = this.reasonInput.value.trim();
+    if (!this.currentTask) return;
+
+    if (this.mode === "skip") {
+      this.currentTask.status = "skipped";
+      this.currentTask.reason = value || "no reason";
+      clearInterval(this.currentTask.intervalID);
+    }
+
+    if (this.mode === "edit") {
+      if (value.length < 3) return alert("Too short");
+      this.currentTask.task = value;
+    }
+
+    this.save();
+    this.closePopup();
+    this.renderTasks();
+  }
+
+  closePopup() {
+    this.popup.style.display = "none";
+    this.currentTask = null;
+  }
+
+  save() {
+    localStorage.setItem("tasks", JSON.stringify(this.tasks));
+  }
+
+  formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  }
+}
+
+const app = new AntiProcastinationApp();
+app.init();

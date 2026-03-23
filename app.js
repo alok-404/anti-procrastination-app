@@ -3,21 +3,23 @@ class AntiProcastinationApp {
     this.tasks = [];
     this.currentTask = null;
     this.mode = null;
-    this.score = 0;
+    this.score = JSON.parse(localStorage.getItem("scores")) || 0;
+    console.log(this.score);
+
     this.container = document.querySelector(".task-list");
     this.popup = document.querySelector(".popup-overlay");
     this.reasonInput = document.querySelector("#ReasonPopupInput");
     this.saveReasonBtn = document.querySelector("#saveReason");
     this.cancelBtn = document.querySelector("#cancelPopup");
 
-    this.scoreHTML = document.querySelector("#score")
+    this.scoreHTML = document.querySelector("#score");
 
     this.saveReasonBtn.addEventListener("click", () => {
       if (!this.currentTask) return;
       const value = this.reasonInput.value.trim();
 
       if (this.mode === "skip") {
-        this.currentTask.reason = value|| "no reason";
+        this.currentTask.reason = value || "no reason";
         this.currentTask.status = "skipped";
 
         clearInterval(this.currentTask.intervalID);
@@ -39,13 +41,12 @@ class AntiProcastinationApp {
       this.closePopup();
     });
 
-       // CLICK OUTSIDE → CLOSE ALL MENUS
+    // CLICK OUTSIDE → CLOSE ALL MENUS
     document.addEventListener("click", () => {
       document.querySelectorAll(".dropdown-menu").forEach((m) => {
         m.classList.remove("show");
       });
     });
-
   }
   init() {
     const data = localStorage.getItem("tasks");
@@ -57,7 +58,9 @@ class AntiProcastinationApp {
         task.intervalID = null;
       }
     });
-
+    
+    this.scoreHTML.innerHTML = this.score;
+    
     console.log("app started");
     this.renderTasks();
     this.inputTask();
@@ -69,14 +72,13 @@ class AntiProcastinationApp {
     taskAddBtn.addEventListener("click", () => {
       const task = taskInput.value.trim();
 
-      if (task.length < 3 ) {
+      if (task.length < 3) {
         alert("Invalid Input");
         return;
       }
       // console.log(task);
       this.addTask(task);
       taskInput.value = "";
-
     });
   }
   addTask(task) {
@@ -122,9 +124,7 @@ class AntiProcastinationApp {
       // TIMER
       const timer = document.createElement("div");
       timer.classList.add("timer");
-        timer.dataset.id = task.id;
-
-      
+      timer.dataset.id = task.id;
 
       if (task.status === "in-progress") {
         timer.textContent = this.formatTime(task.timeLeft);
@@ -161,12 +161,13 @@ class AntiProcastinationApp {
 
       doneBtn.addEventListener("click", (e) => {
         e.stopPropagation();
+
+        if (task.status === "done") return;
         this.doneBtnLogic(task);
-        this.scoreHTML.innerHTML = this.score
-        this.score += 10
-        console.log(this.score);
-        this.scoreHTML.innerHTML = this.score
-      })
+        this.score += 10;
+        localStorage.setItem("scores", JSON.stringify(this.score));
+        this.scoreHTML.innerHTML = this.score;
+      });
 
       // THREE DOT BUTTON
       const menuBtn = document.createElement("button");
@@ -197,13 +198,15 @@ class AntiProcastinationApp {
 
       // MENU ACTIONS
       menu.querySelector(".skip-option").addEventListener("click", () => {
-        this.openPopUp(task, "skip");
+         menu.classList.remove("show");
+  this.openPopUp(task, "skip");
       });
 
       menu.querySelector(".edit-option").addEventListener("click", () => {
         menu.classList.remove("show");
         this.openPopUp(task, "edit");
-        this.saveReasonBtn.textContent = this.mode === "edit" ? "Save Changes" : "Save";
+        this.saveReasonBtn.textContent =
+          this.mode === "edit" ? "Save Changes" : "Save";
       });
 
       menu.querySelector(".delete-option").addEventListener("click", () => {
@@ -222,10 +225,9 @@ class AntiProcastinationApp {
       } else if (task.status === "skipped") {
         startBtn.style.display = "none";
         menuBtn.style.display = "none";
-        btnContainer.innerHTML = "Skipped";
+        btnContainer.textContent = `Skipped: ${task.reason}`;
         doneBtn.style.display = "none";
         text.classList.add("completed");
-        return
       }
 
       // APPEND BUTTONS
@@ -235,8 +237,6 @@ class AntiProcastinationApp {
       card.append(text, timer, btnContainer, menu);
       this.container.appendChild(card);
     });
-
- 
   }
   timerLogic(task) {
     //pause krega timer ko
@@ -268,14 +268,19 @@ class AntiProcastinationApp {
       if (task.timeLeft <= 0) {
         clearInterval(task.intervalID);
         task.status = "done";
-       task.intervalID = null;
+        task.intervalID = null;
 
-    this.saveToLocalStorage();
-    this.renderTasks(); // only once when done
-    return;
+        this.saveToLocalStorage();
+        this.renderTasks(); // only once when done
+        return;
       }
 
-     this.updateTimerUI(task);
+      if (task.timeLeft > 0) {
+  alert("Complete the timer first!");
+  return;
+}
+
+      this.updateTimerUI(task);
     }, 1000);
 
     this.saveToLocalStorage();
@@ -283,11 +288,11 @@ class AntiProcastinationApp {
     this.renderTasks();
   }
   updateTimerUI(task) {
-  const timerEl = document.querySelector(`.timer[data-id="${task.id}"]`);
-  if (timerEl) {
-    timerEl.textContent = this.formatTime(task.timeLeft);
+    const timerEl = document.querySelector(`.timer[data-id="${task.id}"]`);
+    if (timerEl) {
+      timerEl.textContent = this.formatTime(task.timeLeft);
+    }
   }
-}
 
   formatTime(seconds) {
     const min = Math.floor(seconds / 60);
@@ -308,17 +313,18 @@ class AntiProcastinationApp {
   openPopUp(task, mode = "skip") {
     this.popup.style.display = "flex";
     this.currentTask = task;
-    this.mode = mode
+    this.mode = mode;
 
     if (mode === "skip") {
       this.reasonInput.value = "";
       this.reasonInput.placeholder = "Why are you skipping?";
     }
 
-    if ((mode === "edit")) {
+    if (mode === "edit") {
       this.reasonInput.value = task.task;
       this.reasonInput.placeholder = "Edit your task";
     }
+
   }
 
   closePopup() {
