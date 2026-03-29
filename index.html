@@ -8,10 +8,21 @@
   </head>
   <body>
     <div class="app-container">
-      <h2>Do It Now</h2>
+      <div class="header">
+      <h2>Anti Procastination</h2>
+      <p>Sun Mar 20 2026</p>
+      </div>
 
       <!-- Emotional Message -->
-      <div class="message" id="message">Kitne din maze karega bhai</div>
+      <!-- <div class="message" id="message">Kitne din maze karega bhai</div> -->
+      <!-- DAILY PROGRESS -->
+      <div class="daily-stats">
+        <div class="streak-box">🔥 Streak: <span id="streak">0</span> days</div>
+
+        <div class="progress-box">
+          ✅ Today: <span id="todayCount">0</span> / 5
+        </div>
+      </div>
 
       <!-- Input -->
       <div class="task-input">
@@ -52,12 +63,15 @@
       <!-- Empty State -->
       <div class="empty-state">No tasks — add one</div>
 
-
       <!-- for reason -->
       <div class="popup-overlay" id="popup">
         <div class="popup-box">
           <p>Why did you skip?</p>
-          <input type="text" id="ReasonPopupInput" placeholder="1 line reason..." />
+          <input
+            type="text"
+            id="ReasonPopupInput"
+            placeholder="1 line reason..."
+          />
           <div class="popup-actions">
             <button id="saveReason">Save</button>
             <button id="cancelPopup">Cancel</button>

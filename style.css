@@ -252,3 +252,37 @@ button {
   text-decoration: line-through;
   opacity: 0.6;
 }
+
+.daily-stats {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+  gap: 10px;
+}
+
+.streak-box,
+.progress-box {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  
+}
+
+
+
+
+
+
+.goal-complete {
+  background: #00c853 !important;
+  color: white !important;
+}
+
+.header{
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  text-align: end;
+}

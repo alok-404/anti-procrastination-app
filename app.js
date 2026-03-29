@@ -3,6 +3,17 @@ class AntiProcastinationApp {
     this.tasks = [];
     this.currentTask = null;
     this.mode = null;
+
+    this.daily = JSON.parse(localStorage.getItem("daily"));
+
+    if (!this.daily || !this.daily.date) {
+      this.daily = {
+        date: new Date().toDateString(),
+        completedToday: 0,
+        streak: 0,
+      };
+    }
+
     this.score = JSON.parse(localStorage.getItem("scores")) || 0;
     console.log(this.score);
 
@@ -58,12 +69,37 @@ class AntiProcastinationApp {
         task.intervalID = null;
       }
     });
-    
+
     this.scoreHTML.innerHTML = this.score;
-    
+
     console.log("app started");
+
+    const today = new Date().toDateString();
+
+    if (this.daily.date !== today) {
+      if (this.daily.completedToday < 5) {
+        this.daily.streak = 0; // break streak
+      }
+
+      this.daily.completedToday = 0;
+      this.daily.date = today;
+
+      localStorage.setItem("daily", JSON.stringify(this.daily));
+    }
+
+    document.getElementById("todayCount").textContent =
+      this.daily.completedToday;
+
+    document.getElementById("streak").textContent = this.daily.streak;
+
+   const headerDate = document.querySelector(".header p");
+if (headerDate) {
+  headerDate.textContent = this.daily.date;
+}
+
     this.renderTasks();
     this.inputTask();
+    // console.log(this.daily);
   }
   inputTask() {
     const taskInput = document.querySelector(".task-input input");
@@ -162,11 +198,35 @@ class AntiProcastinationApp {
       doneBtn.addEventListener("click", (e) => {
         e.stopPropagation();
 
+
+        if (task.timeLeft > 0) {
+          alert("Complete the timer first!");
+          return;
+        }
+
         if (task.status === "done") return;
+
+
         this.doneBtnLogic(task);
+
+        this.daily.completedToday++;
+
+        if (this.daily.completedToday === 5) {
+          this.daily.streak++;
+        }
+
+        localStorage.setItem("daily", JSON.stringify(this.daily));
+
         this.score += 10;
         localStorage.setItem("scores", JSON.stringify(this.score));
+
+
         this.scoreHTML.innerHTML = this.score;
+        document.getElementById("todayCount").textContent =
+          this.daily.completedToday;
+        document.getElementById("streak").textContent = this.daily.streak;
+
+        this.renderTasks(); 
       });
 
       // THREE DOT BUTTON
@@ -198,8 +258,8 @@ class AntiProcastinationApp {
 
       // MENU ACTIONS
       menu.querySelector(".skip-option").addEventListener("click", () => {
-         menu.classList.remove("show");
-  this.openPopUp(task, "skip");
+        menu.classList.remove("show");
+        this.openPopUp(task, "skip");
       });
 
       menu.querySelector(".edit-option").addEventListener("click", () => {
@@ -275,11 +335,6 @@ class AntiProcastinationApp {
         return;
       }
 
-      if (task.timeLeft > 0) {
-  alert("Complete the timer first!");
-  return;
-}
-
       this.updateTimerUI(task);
     }, 1000);
 
@@ -307,7 +362,7 @@ class AntiProcastinationApp {
     task.intervalID = null;
     this.saveToLocalStorage();
 
-    this.renderTasks();
+
   }
 
   openPopUp(task, mode = "skip") {
@@ -324,7 +379,6 @@ class AntiProcastinationApp {
       this.reasonInput.value = task.task;
       this.reasonInput.placeholder = "Edit your task";
     }
-
   }
 
   closePopup() {
