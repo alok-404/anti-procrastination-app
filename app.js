@@ -11,6 +11,7 @@ class AntiProcastinationApp {
         date: new Date().toDateString(),
         completedToday: 0,
         streak: 0,
+        streakCounted: false,
       };
     }
 
@@ -33,8 +34,15 @@ class AntiProcastinationApp {
         this.currentTask.reason = value || "no reason";
         this.currentTask.status = "skipped";
 
+        this.showMessage(this.getRandomMessage("skip"), "error");
         clearInterval(this.currentTask.intervalID);
         this.currentTask.intervalID = null;
+
+        this.score -= 5;
+        if (this.score < 0) this.score = 0;
+
+        localStorage.setItem("scores", JSON.stringify(this.score));
+        this.scoreHTML.innerHTML = this.score;
       }
       if (this.mode === "edit") {
         if (value.length < 3) {
@@ -74,64 +82,80 @@ class AntiProcastinationApp {
 
     console.log("app started");
 
-    const today = new Date().toDateString();
-
-    if (this.daily.date !== today) {
-      if (this.daily.completedToday < 5) {
-        this.daily.streak = 0; // break streak
-      }
-
-      this.daily.completedToday = 0;
-      this.daily.date = today;
-
-      localStorage.setItem("daily", JSON.stringify(this.daily));
+    const headerDate = document.querySelector(".header p");
+    if (headerDate) {
+      headerDate.textContent = this.daily.date;
     }
+    this.tasks.forEach((task) => {
+      task.intervalID = null; // clean always
+    });
+
+    this.resetDayIfNeeded();
 
     document.getElementById("todayCount").textContent =
       this.daily.completedToday;
 
     document.getElementById("streak").textContent = this.daily.streak;
 
-   const headerDate = document.querySelector(".header p");
-if (headerDate) {
-  headerDate.textContent = this.daily.date;
-}
-
     this.renderTasks();
     this.inputTask();
-    // console.log(this.daily);
+    if (this.daily.completedToday === 0) {
+      this.showMessage("Aaj bhi zero? Fir se?", "error");
+    }
+    if (this.daily.completedToday === 4) {
+      this.showMessage("Bas 1 aur. Don't mess this up.", "success");
+    }
   }
   inputTask() {
     const taskInput = document.querySelector(".task-input input");
     const taskAddBtn = document.querySelector(".task-input .add-btn");
+    let selectedTime = 5;
+
+    document.querySelectorAll(".time-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        selectedTime = parseInt(btn.dataset.time);
+      });
+    });
 
     taskAddBtn.addEventListener("click", () => {
       const task = taskInput.value.trim();
 
-      if (task.length < 3) {
-        alert("Invalid Input");
-        return;
-      }
-      // console.log(task);
-      this.addTask(task);
+    if (value.length < 3) {
+  this.showMessage("Task bahut chota hai", "error");
+  return;
+}
+
+      // console.log(selectedTime);
+      this.addTask(task, selectedTime);
       taskInput.value = "";
     });
   }
-  addTask(task) {
+  addTask(task, minutes) {
     // console.log("add task = " + task );
 
     if (this.tasks.length >= 5) {
-      alert("You can add only 5 tasks wrna tu procastinate krega");
-      return;
-    }
+  this.showMessage(
+    "5 se zyada task add karega toh kaam kab karega?",
+    "error"
+  );
+  return;
+}
+
+    if (minutes === 60 && this.score < 50) {
+  this.showMessage("60 min unlock karne ke liye 50 score chahiye", "error");
+  return;
+}
 
     const newTask = {
       id: Date.now(),
       task,
       status: "pending",
       reason: null,
-      timeLeft: 300,
+      timeLeft: minutes * 60,
+      duration: minutes * 60,
+      createdAt: Date.now(),
       intervalID: null,
+      startedAt: null,
     };
     this.tasks.push(newTask);
     // console.log(newTask);
@@ -153,8 +177,11 @@ if (headerDate) {
       text.classList.add("task-text");
       text.textContent = task.task;
 
-      if (task.status === "done" || task.status === "skipped") {
+      if (task.status === "done") {
         text.classList.add("completed");
+      }
+      if (task.status === "skipped") {
+        text.classList.add("skipped-text");
       }
 
       // TIMER
@@ -198,21 +225,20 @@ if (headerDate) {
       doneBtn.addEventListener("click", (e) => {
         e.stopPropagation();
 
-
-        if (task.timeLeft > 0) {
-          alert("Complete the timer first!");
+        if (task.status !== "ready-to-complete") {
+          this.showMessage("Pehle timer complete kar", "error");
           return;
         }
 
         if (task.status === "done") return;
 
-
         this.doneBtnLogic(task);
 
         this.daily.completedToday++;
 
-        if (this.daily.completedToday === 5) {
+        if (this.daily.completedToday === 5 && !this.daily.streakCounted) {
           this.daily.streak++;
+          this.daily.streakCounted = true;
         }
 
         localStorage.setItem("daily", JSON.stringify(this.daily));
@@ -220,13 +246,12 @@ if (headerDate) {
         this.score += 10;
         localStorage.setItem("scores", JSON.stringify(this.score));
 
-
         this.scoreHTML.innerHTML = this.score;
         document.getElementById("todayCount").textContent =
           this.daily.completedToday;
         document.getElementById("streak").textContent = this.daily.streak;
-
-        this.renderTasks(); 
+        this.saveToLocalStorage();
+        this.renderTasks();
       });
 
       // THREE DOT BUTTON
@@ -258,15 +283,36 @@ if (headerDate) {
 
       // MENU ACTIONS
       menu.querySelector(".skip-option").addEventListener("click", () => {
+        if (task.status === "in-progress") {
+          this.showMessage("Task running hai. Skip nahi kar sakta", "error");
+          return;
+        }
+
+        if (task.timeLeft === task.duration) {
+          this.showMessage("Start toh kar pehle", "error");
+          return;
+        }
+
+        let minWait = 60000; // default 1 min
+
+        if (this.score >= 50) minWait = 300000; // 5 min
+        if (this.score >= 150) minWait = 600000; // 10 min
+
+        const timePassed = Date.now() - (task.startedAt || task.createdAt);
+
+        if (timePassed < minWait) {
+          this.showMessage(`At least try ${minWait / 60000} min`, "error");
+          return;
+        }
+
         menu.classList.remove("show");
         this.openPopUp(task, "skip");
+        
       });
-
       menu.querySelector(".edit-option").addEventListener("click", () => {
         menu.classList.remove("show");
         this.openPopUp(task, "edit");
-        this.saveReasonBtn.textContent =
-          this.mode === "edit" ? "Save Changes" : "Save";
+        this.saveReasonBtn.textContent = "Save Changes";
       });
 
       menu.querySelector(".delete-option").addEventListener("click", () => {
@@ -277,15 +323,22 @@ if (headerDate) {
       });
 
       // DONE STATE UI
+      if (task.status === "ready-to-complete") {
+        startBtn.style.display = "none";
+        doneBtn.style.backgroundColor = "orange";
+        doneBtn.textContent = "Complete Now";
+        card.classList.add("ready");
+      }
       if (task.status === "done") {
-        doneBtn.textContent = "You did it";
-        doneBtn.style.backgroundColor = "grey";
+        btnContainer.innerHTML = "<span>Done ✅</span>";
+        doneBtn.style.display = "none";
         startBtn.style.display = "none";
         menuBtn.style.display = "none";
       } else if (task.status === "skipped") {
         startBtn.style.display = "none";
         menuBtn.style.display = "none";
-        btnContainer.textContent = `Skipped: ${task.reason}`;
+        btnContainer.innerHTML = `<span>Skipped: ${task.reason}</span>`;
+        card.classList.add("skipped-card");
         doneBtn.style.display = "none";
         text.classList.add("completed");
       }
@@ -318,7 +371,16 @@ if (headerDate) {
       }
     });
 
+    if (task.duration >= 3600 && task.status === "pending") {
+      const confirmStart = confirm("60 min deep work. Sure?");
+      if (!confirmStart) return;
+    }
+
     //start/resume
+
+    if (!task.startedAt) {
+      task.startedAt = Date.now();
+    }
     task.status = "in-progress";
     this.saveToLocalStorage();
 
@@ -327,8 +389,9 @@ if (headerDate) {
 
       if (task.timeLeft <= 0) {
         clearInterval(task.intervalID);
-        task.status = "done";
+        task.status = "ready-to-complete";
         task.intervalID = null;
+        this.showMessage("Time up. Finish it.", "success");
 
         this.saveToLocalStorage();
         this.renderTasks(); // only once when done
@@ -337,7 +400,6 @@ if (headerDate) {
 
       this.updateTimerUI(task);
     }, 1000);
-
     this.saveToLocalStorage();
 
     this.renderTasks();
@@ -357,12 +419,10 @@ if (headerDate) {
 
   doneBtnLogic(task) {
     task.status = "done";
-
+    this.showMessage(this.getRandomMessage("done"), "success");
     clearInterval(task.intervalID);
     task.intervalID = null;
     this.saveToLocalStorage();
-
-
   }
 
   openPopUp(task, mode = "skip") {
@@ -384,10 +444,70 @@ if (headerDate) {
   closePopup() {
     this.popup.style.display = "none";
     this.currentTask = null;
+    this.saveReasonBtn.textContent = "Save";
   }
 
   saveToLocalStorage() {
-    localStorage.setItem("tasks", JSON.stringify(this.tasks));
+    const cleanTasks = this.tasks.map(({ intervalID, ...rest }) => rest);
+    localStorage.setItem("tasks", JSON.stringify(cleanTasks));
+  }
+
+  resetDayIfNeeded() {
+    const today = new Date().toDateString();
+    if (this.daily.date !== today) {
+      if (this.daily.completedToday < 5) {
+        this.daily.streak = 0;
+      }
+      this.getDayResult();
+      this.daily = {
+        date: today,
+        completedToday: 0,
+        streak: this.daily.streak,
+        streakCounted: false,
+      };
+      this.tasks = [];
+      localStorage.removeItem("tasks");
+
+      localStorage.setItem("daily", JSON.stringify(this.daily));
+    }
+  }
+
+  getDayResult() {
+    if (this.daily.completedToday === 5) {
+      this.showMessage("Streak maintained 🔥", "success");
+    } else {
+      this.showMessage("Discipline break ho gaya.", "error");
+    }
+  }
+
+  showMessage(text, type = "normal") {
+  const msg = document.getElementById("message");
+  msg.textContent = text;
+
+  msg.style.color =
+    type === "error" ? "red" : type === "success" ? "lightgreen" : "#fff";
+
+  clearTimeout(this.msgTimeout);
+
+  this.msgTimeout = setTimeout(() => {
+    msg.textContent = "";
+  }, 2500);
+}
+
+  getRandomMessage(type) {
+    const messages = {
+      skip: [
+        "Fir bhag gaya...",
+        "Easy way out again?",
+        "Discipline zero hai kya?",
+        "Khud se jhoot bol raha hai tu?",
+        "Hogayi reels motivation khatam?"
+      ],
+      done: ["Good job 🔥", "Aaj kuch toh kiya tune", "Keep going 💪","Aaj improve hua hai tu","ye huii na baat, Good"],
+    };
+
+    const arr = messages[type];
+    return arr[Math.floor(Math.random() * arr.length)];
   }
 }
 

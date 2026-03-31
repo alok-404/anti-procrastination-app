@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Do It Now</title>
+    <title>Anti Procastination app</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="app-container">
       <div class="header">
-      <h2>Anti Procastination</h2>
-      <p>Sun Mar 20 2026</p>
+        <h2>Anti Procastination</h2>
+        <p>Sun Mar 20 2026</p>
       </div>
 
       <!-- Emotional Message -->
@@ -27,6 +27,10 @@
       <!-- Input -->
       <div class="task-input">
         <input type="text" placeholder="Add a task (max 5)" />
+        <button class="time-btn" data-time="5">5 min</button>
+        <button class="time-btn" data-time="15">15 min</button>
+        <button class="time-btn" data-time="25">25 min</button>
+        <button class="time-btn" data-time="60">60 min</button>
         <button class="add-btn">Add</button>
       </div>
 
@@ -60,8 +64,8 @@
         <div>Missed Count: <span id="missed">1</span></div>
       </div>
 
-      <!-- Empty State -->
-      <div class="empty-state">No tasks — add one</div>
+      <!-- Message -->
+      <div class="message" id="message">Kyo nahi ho rhi hai padai</div>
 
       <!-- for reason -->
       <div class="popup-overlay" id="popup">
