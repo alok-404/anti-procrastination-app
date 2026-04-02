@@ -596,9 +596,9 @@ class AntiProcastinationApp {
         container.classList.add("critical");
       }
 
-      if (hrs === 0 && mins <= 10) {
-        this.showMessage("Last 10 min. Finish or lose the day.", "error");
-      }
+     if (hrs === 0 && mins === 10 && secs === 0) {
+  this.showMessage("Last 10 min. Finish or lose the day.", "error");
+}
     };
 
     update();
