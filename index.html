@@ -10,6 +10,12 @@
     <div class="app-container">
       <div class="header">
         <h2>Anti Procastination</h2>
+      </div>
+
+      <div class="day-timer">
+        <div>
+        ⏳ Day ends in: <span id="dayTimer">00:00:00</span>
+        </div>
         <p>Sun Mar 20 2026</p>
       </div>
 
@@ -30,38 +36,23 @@
         <button class="time-btn" data-time="5">5 min</button>
         <button class="time-btn" data-time="15">15 min</button>
         <button class="time-btn" data-time="25">25 min</button>
-        <button class="time-btn" data-time="60">60 min</button>
-        <button class="add-btn">Add</button>
+      <button class="time-btn" data-time="60">60 min</button>
+      <button class="add-btn">Add</button>
       </div>
+
+
+      <!-- `<div class="empty-state">
+     
+      No tasks. Add one.
+      </div> -->
+
 
       <!-- Task List -->
-      <div class="task-list" id="taskList">
-        <!-- Dummy Task 1 -->
-        <!-- <div class="task-card" data-id="1">
-        <span class="task-text">Drink water</span>
-         <div class="timer">05:00</div>
-        <div class="task-buttons">
-          <button class="start-btn">Start</button>
-          <button class="done-btn">Done</button>
-          <button class="skip-btn">Skip</button>
-        </div>
-      </div> -->
-
-        <!-- Dummy Task 2 -->
-        <!-- <div class="task-card" data-id="2">
-        <span class="task-text">Write 100 words</span>
-        <div class="task-buttons">
-          <button class="start-btn">Start</button>
-          <button class="done-btn">Done</button>
-          <button class="skip-btn">Skip</button>
-        </div>
-      </div> -->
-      </div>
+      <div class="task-list" id="taskList"></div>
 
       <!-- Score Section -->
       <div class="scoreboard">
         <div>Total Score: <span id="score">0</span></div>
-        <div>Missed Count: <span id="missed">1</span></div>
       </div>
 
       <!-- Message -->

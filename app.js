@@ -38,7 +38,8 @@ class AntiProcastinationApp {
         clearInterval(this.currentTask.intervalID);
         this.currentTask.intervalID = null;
 
-        this.score -= 5;
+        this.score -= 10;
+        this.daily.completedToday--;
         if (this.score < 0) this.score = 0;
 
         localStorage.setItem("scores", JSON.stringify(this.score));
@@ -82,7 +83,7 @@ class AntiProcastinationApp {
 
     console.log("app started");
 
-    const headerDate = document.querySelector(".header p");
+    const headerDate = document.querySelector(".day-timer p");
     if (headerDate) {
       headerDate.textContent = this.daily.date;
     }
@@ -97,8 +98,10 @@ class AntiProcastinationApp {
 
     document.getElementById("streak").textContent = this.daily.streak;
 
+    this.streakRiskLogic();
     this.renderTasks();
     this.inputTask();
+    this.startDayCountdown();
     if (this.daily.completedToday === 0) {
       this.showMessage("Aaj bhi zero? Fir se?", "error");
     }
@@ -120,10 +123,10 @@ class AntiProcastinationApp {
     taskAddBtn.addEventListener("click", () => {
       const task = taskInput.value.trim();
 
-    if (value.length < 3) {
-  this.showMessage("Task bahut chota hai", "error");
-  return;
-}
+      if (task.length < 3) {
+        this.showMessage("Task bahut chota hai", "error");
+        return;
+      }
 
       // console.log(selectedTime);
       this.addTask(task, selectedTime);
@@ -134,17 +137,17 @@ class AntiProcastinationApp {
     // console.log("add task = " + task );
 
     if (this.tasks.length >= 5) {
-  this.showMessage(
-    "5 se zyada task add karega toh kaam kab karega?",
-    "error"
-  );
-  return;
-}
+      this.showMessage(
+        "5 se zyada task add karega toh kaam kab karega?",
+        "error",
+      );
+      return;
+    }
 
     if (minutes === 60 && this.score < 50) {
-  this.showMessage("60 min unlock karne ke liye 50 score chahiye", "error");
-  return;
-}
+      this.showMessage("60 min unlock karne ke liye 50 score chahiye", "error");
+      return;
+    }
 
     const newTask = {
       id: Date.now(),
@@ -165,6 +168,13 @@ class AntiProcastinationApp {
   }
 
   renderTasks(tasks = this.tasks) {
+    if (tasks.length === 0) {
+      this.container.innerHTML = `<div class="empty-state">
+       <img src="images/tkthao219-bubududu.gif" alt="" srcset="">
+      No tasks. Add one.
+      </div>`;
+      return;
+    }
     this.container.innerHTML = "";
 
     tasks.forEach((task) => {
@@ -307,7 +317,6 @@ class AntiProcastinationApp {
 
         menu.classList.remove("show");
         this.openPopUp(task, "skip");
-        
       });
       menu.querySelector(".edit-option").addEventListener("click", () => {
         menu.classList.remove("show");
@@ -422,6 +431,7 @@ class AntiProcastinationApp {
     this.showMessage(this.getRandomMessage("done"), "success");
     clearInterval(task.intervalID);
     task.intervalID = null;
+    this.streakRiskLogic();
     this.saveToLocalStorage();
   }
 
@@ -454,17 +464,32 @@ class AntiProcastinationApp {
 
   resetDayIfNeeded() {
     const today = new Date().toDateString();
-    if (this.daily.date !== today) {
-      if (this.daily.completedToday < 5) {
+    const lastDate = new Date(this.daily.date);
+    const currentDate = new Date(today);
+
+    const diffDays = Math.floor(
+      (currentDate - lastDate) / (1000 * 60 * 60 * 24),
+    );
+
+    if (diffDays >= 1) {
+      const prevCompleted = this.daily.completedToday;
+
+      // 🔥 result based on last active day
+      if (prevCompleted === 5 && diffDays === 1) {
+        this.showMessage("Streak maintained 🔥", "success");
+      } else {
+        this.showMessage("Discipline break ho gaya.", "error");
         this.daily.streak = 0;
       }
-      this.getDayResult();
+
+      // 🔥 reset day
       this.daily = {
         date: today,
         completedToday: 0,
         streak: this.daily.streak,
         streakCounted: false,
       };
+
       this.tasks = [];
       localStorage.removeItem("tasks");
 
@@ -481,18 +506,18 @@ class AntiProcastinationApp {
   }
 
   showMessage(text, type = "normal") {
-  const msg = document.getElementById("message");
-  msg.textContent = text;
+    const msg = document.getElementById("message");
+    msg.textContent = text;
 
-  msg.style.color =
-    type === "error" ? "red" : type === "success" ? "lightgreen" : "#fff";
+    msg.style.color =
+      type === "error" ? "red" : type === "success" ? "lightgreen" : "#fff";
 
-  clearTimeout(this.msgTimeout);
+    clearTimeout(this.msgTimeout);
 
-  this.msgTimeout = setTimeout(() => {
-    msg.textContent = "";
-  }, 2500);
-}
+    this.msgTimeout = setTimeout(() => {
+      msg.textContent = "";
+    }, 10000);
+  }
 
   getRandomMessage(type) {
     const messages = {
@@ -501,13 +526,83 @@ class AntiProcastinationApp {
         "Easy way out again?",
         "Discipline zero hai kya?",
         "Khud se jhoot bol raha hai tu?",
-        "Hogayi reels motivation khatam?"
+        "Hogayi reels motivation khatam?",
       ],
-      done: ["Good job 🔥", "Aaj kuch toh kiya tune", "Keep going 💪","Aaj improve hua hai tu","ye huii na baat, Good"],
+      done: [
+        "Good job 🔥",
+        "Aaj kuch toh kiya tune",
+        "Keep going 💪",
+        "Aaj improve hua hai tu",
+        "ye huii na baat, Good",
+      ],
     };
 
     const arr = messages[type];
     return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  streakRiskLogic() {
+    let message = "";
+    let type = "normal";
+
+    if (this.daily.completedToday === 0) {
+      message = "Aaj bhi zero?";
+      type = "error";
+    } else if (this.daily.completedToday === 2) {
+      message = "Still behind";
+      type = "error";
+    } else if (this.daily.completedToday === 4) {
+      message = "Last one. Don't mess this up";
+      type = "success";
+    } else if (this.daily.completedToday < 5) {
+      message = "Streak in danger";
+      type = "error";
+    }
+
+    if (message) {
+      this.showMessage(message, type);
+    }
+  }
+
+  startDayCountdown() {
+    const timerEl = document.getElementById("dayTimer");
+    const container = document.querySelector(".day-timer");
+
+    const update = () => {
+      const now = new Date();
+
+      const end = new Date();
+      end.setHours(24, 0, 0, 0);
+
+      const diff = end - now;
+
+      if (diff <= 0) {
+        timerEl.textContent = "00:00:00";
+        return;
+      }
+
+      const hrs = Math.floor(diff / (1000 * 60 * 60));
+      const mins = Math.floor((diff / (1000 * 60)) % 60);
+      const secs = Math.floor((diff / 1000) % 60);
+
+      timerEl.textContent = `${String(hrs).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+
+      // 💀 PRESSURE LEVELS
+      if (hrs <= 3) {
+        container.classList.add("danger");
+      }
+
+      if (hrs === 0 && mins <= 30) {
+        container.classList.add("critical");
+      }
+
+      if (hrs === 0 && mins <= 10) {
+        this.showMessage("Last 10 min. Finish or lose the day.", "error");
+      }
+    };
+
+    update();
+    setInterval(update, 1000);
   }
 }
 
